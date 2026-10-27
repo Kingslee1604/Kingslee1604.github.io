@@ -19,7 +19,9 @@ metrics:
 
 *M.S. Computer Science project, California State University, Dominguez Hills (Spring 2026),
 sponsored by the Cedars-Sinai AI Campus (Project #32: "Natural Language Processing in Cancer:
-Extracting Diagnostic Insights from Pathology Reports").*
+Extracting Diagnostic Insights from Pathology Reports").* The full technical write-up (every
+method's settings, how to reproduce, and known issues) is in
+[PROJECT_DETAILS.md](https://github.com/Kingslee1604/MEDREx-Masters-Project/blob/submission/PROJECT_DETAILS.md).
 
 ## The problem
 
