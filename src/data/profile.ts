@@ -40,7 +40,7 @@ export const experience = [
     dates: 'Sep 2024 – Present',
     bullets: [
       'Designed AI batch applications that use LLM APIs to audit contact-center conversations and score agent performance.',
-      'Built and deployed Copilot Studio AI agents in Teams and SharePoint for document Q&A and API-driven answers.',
+      'Build enterprise AI agents with Azure OpenAI, Azure AI Foundry, Semantic Kernel and LangChain/LangGraph, integrated with Teams, SharePoint and internal APIs, including Copilot Studio agents for document Q&A.',
       'Delivered enterprise apps on .NET Core, Azure, Salesforce, Data Lake, SQL and Python; mentor junior engineers.',
     ],
   },
@@ -80,7 +80,21 @@ export const experience = [
 ];
 
 export const skills = [
-  { group: 'AI & LLM', items: ['LLM APIs', 'AI agents', 'RAG', 'MCP', 'Copilot Studio', 'Ollama', 'pgvector'] },
+  {
+    group: 'AI & LLM',
+    items: [
+      'Azure OpenAI',
+      'Azure AI Foundry',
+      'Semantic Kernel',
+      'LangChain/LangGraph',
+      'AI agents',
+      'RAG',
+      'MCP',
+      'Copilot Studio',
+      'Ollama',
+      'pgvector',
+    ],
+  },
   { group: 'Backend', items: ['Python', 'FastAPI', 'C#', '.NET Core 6/8', 'ASP.NET Web API', 'Java', 'C++'] },
   { group: 'Data', items: ['PostgreSQL', 'SQL Server', 'Oracle', 'DynamoDB', 'MongoDB', 'Azure SQL'] },
   {
