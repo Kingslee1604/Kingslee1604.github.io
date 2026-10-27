@@ -56,7 +56,10 @@ jobs:
       - name: Link check
         run: pnpm run links
       - name: Install Chromium for tests
-        run: pnpm exec playwright install --with-deps chromium
+        # No --with-deps: the runner image already has Chrome's system libraries, and the apt
+        # mirror it would call can hang (seen 2026-10-27). Fail fast instead of waiting.
+        timeout-minutes: 5
+        run: pnpm exec playwright install chromium
       - name: Accessibility, phone width, keyboard and theme tests
         run: pnpm run test:e2e
       - name: Lighthouse (mobile, 95+ in every category)
