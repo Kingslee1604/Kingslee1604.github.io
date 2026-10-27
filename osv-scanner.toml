@@ -1,0 +1,30 @@
+# OSV-Scanner exceptions. Each one needs a reason and an expiry; when it expires the scan
+# fails again and the decision must be reviewed. All three live in Lighthouse CI's bundled
+# browser downloader (@puppeteer/browsers), which this project never runs: Lighthouse uses
+# Playwright's Chromium (scripts/lighthouse.sh). None of it ships to visitors.
+
+[[IgnoredVulns]]
+id = "GHSA-7pqw-9j4j-h8q3"
+ignoreUntil = 2027-01-25T00:00:00Z
+reason = """extract-zip 2.0.1: no fixed version exists. Used only by @puppeteer/browsers to \
+unpack browser downloads, which we never trigger. Accepted 2026-10-27; review at expiry."""
+
+[[IgnoredVulns]]
+id = "GHSA-jmr9-qjv8-65gv"
+ignoreUntil = 2027-01-25T00:00:00Z
+reason = """extract-zip 2.0.1: no fixed version exists. Same path and reasoning as \
+GHSA-7pqw-9j4j-h8q3. Accepted 2026-10-27; review at expiry."""
+
+[[IgnoredVulns]]
+id = "GHSA-c475-qrg2-pj4r"
+ignoreUntil = 2027-01-25T00:00:00Z
+reason = """basic-ftp 5.x: fixed only in 6.x, a major version get-uri (^5) does not accept. \
+Reached through proxy-agent for ftp:// URLs, which Lighthouse never fetches here. \
+Accepted 2026-10-27; review at expiry."""
+
+[[IgnoredVulns]]
+id = "GHSA-mrhx-c7xc-m3w5"
+ignoreUntil = 2027-01-25T00:00:00Z
+reason = """zod 3.25.76: fixed only in zod 4, which chromium-bidi (inside Lighthouse's \
+puppeteer-core) does not accept. It parses messages from a local, trusted browser only. \
+The site's own zod (Astro) is already on the fixed 4.x line. Accepted 2026-10-27."""

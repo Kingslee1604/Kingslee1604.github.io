@@ -1,0 +1,94 @@
+# Quality gates for every change: secrets and dependency scans, type check, build, link check,
+# accessibility and phone-width tests (Playwright + axe), and Lighthouse 95+ on mobile.
+# On main, the site that passed those gates is deployed to GitHub Pages.
+# Actions are pinned to commit SHAs; tools are installed by a checksum-verified script.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * 1" # Mondays: catches links that broke on other sites
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  # Superseded pull-request runs are cancelled; runs on main finish, so a deploy is never cut off.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  quality:
+    name: scans, build, links, accessibility, Lighthouse
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.local/bin
+            ~/.local/opt
+            ~/.cache/node/corepack
+            ~/.local/share/pnpm/store
+            ~/.cache/ms-playwright
+          key: tools-${{ runner.os }}-${{ hashFiles('scripts/install-tools.sh', 'pnpm-lock.yaml') }}
+      - name: Install pinned tools
+        run: ./scripts/install-tools.sh && echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Install dependencies from the lockfile
+        run: pnpm install --frozen-lockfile
+      - name: Secret scan (gitleaks) and dependency scan (OSV-Scanner)
+        run: pnpm run scan
+      - name: Type check
+        run: pnpm run check
+      - name: Build
+        run: pnpm run build
+      - name: Link check
+        run: pnpm run links
+      - name: Install Chromium for tests
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Accessibility, phone width, keyboard and theme tests
+        run: pnpm run test:e2e
+      - name: Lighthouse (mobile, 95+ in every category)
+        run: pnpm run lighthouse
+      - name: Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: lighthouse
+          path: .lighthouseci/
+          if-no-files-found: ignore
+      - name: Package the site for GitHub Pages
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist/
+
+  deploy:
+    name: deploy to GitHub Pages
+    needs: quality
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

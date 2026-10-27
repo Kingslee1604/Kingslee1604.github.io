@@ -1,0 +1,195 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { newTab } from '../data/profile';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { title, summary, tags, repo, release, cover, coverAlt, caseStudy, metrics, featured } = project.data;
+const caseStudyUrl = `/projects/${project.id}/`;
+---
+
+<article class:list={['card', { featured, compact: !featured && !cover }]}>
+  {
+    cover && (
+      <div class="media">
+        <Image src={cover} alt={coverAlt ?? ''} widths={[480, 720, 1040]} sizes="(min-width: 960px) 520px, 100vw" />
+      </div>
+    )
+  }
+  <div class="body">
+    <div class="title-row">
+      <h3>{caseStudy ? <a href={caseStudyUrl}>{title}</a> : title}</h3>
+      {release && <span class="badge">{release.label}</span>}
+    </div>
+    <p class="summary">{summary}</p>
+    {
+      metrics.length > 0 && (
+        <ul class="metrics">
+          {metrics.map((m) => (
+            <li>
+              <span class="value">{m.value}</span>
+              <span class="label">{m.label}</span>
+              <a class="source" href={m.source} {...newTab}>
+                source<span class="visually-hidden"> for {m.label} (opens in a new tab)</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    <div class="foot">
+    <ul class="tags" aria-label="Technologies">
+      {tags.map((t) => <li>{t}</li>)}
+    </ul>
+    <p class="links">
+      {caseStudy && <a href={caseStudyUrl}>Read the case study →</a>}
+      <a href={repo} {...newTab}>Code<span class="visually-hidden"> for {title} (opens in a new tab)</span></a>
+      {
+        release && (
+          <a href={release.url} {...newTab}>
+            Release {release.label}
+            <span class="visually-hidden"> (opens in a new tab)</span>
+          </a>
+        )
+      }
+    </p>
+    </div>
+  </div>
+</article>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  .media {
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .media img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top left;
+  }
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 24px;
+  }
+  .title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+  }
+  h3 {
+    font-size: 24px;
+  }
+  h3 a {
+    color: var(--text);
+    text-decoration: none;
+  }
+  h3 a:hover {
+    text-decoration: underline;
+  }
+  .badge {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ok);
+    background: var(--ok-bg);
+    border: 1px solid var(--ok-border);
+    border-radius: 999px;
+    padding: 3px 10px;
+  }
+  .summary {
+    color: var(--muted);
+  }
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .metrics li {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-2);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .value {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .label {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .source {
+    font-size: 13px;
+    margin-top: 2px;
+  }
+  .foot {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  /* A secondary project without a picture: one slim row. */
+  .compact .body {
+    gap: 10px;
+    padding: 20px 24px;
+  }
+  .compact h3 {
+    font-size: 20px;
+  }
+  .compact .foot {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px 24px;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    font-weight: 600;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  @media (min-width: 960px) {
+    .featured {
+      flex-direction: row;
+    }
+    .featured .media {
+      width: 520px;
+      flex-shrink: 0;
+      border-bottom: 0;
+      border-right: 1px solid var(--border);
+    }
+    .featured .media img {
+      height: 100%;
+    }
+    .featured .body {
+      padding: 28px 32px;
+    }
+  }
+</style>

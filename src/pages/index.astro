@@ -1,0 +1,394 @@
+---
+import { existsSync } from 'node:fs';
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import photo from '../assets/kingslee.jpg';
+import { profile, proofPoints, experience, skills, certifications, education, newTab } from '../data/profile';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const featured = projects.filter((p) => p.data.featured);
+const more = projects.filter((p) => !p.data.featured);
+// The resume button appears only once public/resume.pdf exists (a version without phone or email).
+const hasResume = existsSync('public/resume.pdf');
+---
+
+<Base>
+  <section class="hero container" aria-labelledby="hero-title">
+    <div class="hero-text">
+      <p class="eyebrow">{profile.eyebrow}</p>
+      <h1 id="hero-title">{profile.headline}</h1>
+      <p class="lede">{profile.subline}</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#projects">See projects</a>
+        {
+          hasResume && (
+            <a class="btn" href="/resume.pdf" download>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
+              </svg>
+              Resume (PDF)
+            </a>
+          )
+        }
+        <a class="btn" href={profile.links.github} {...newTab}>
+          GitHub<span class="visually-hidden"> (opens in a new tab)</span>
+        </a>
+        <a class="btn" href={profile.links.linkedin} {...newTab}>
+          LinkedIn<span class="visually-hidden"> (opens in a new tab)</span>
+        </a>
+      </div>
+    </div>
+    <div class="photo">
+      <svg class="hex" viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M50 3l40.7 23.5v47L50 97 9.3 73.5v-47z"></path>
+      </svg>
+      <Image
+        src={photo}
+        alt={`Portrait of ${profile.name}`}
+        widths={[160, 320, 400]}
+        sizes="(min-width: 960px) 300px, 160px"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </div>
+  </section>
+
+  <section class="container" aria-label="Highlights">
+    <ul class="proof">
+      {
+        proofPoints.map((p) => (
+          <li>
+            <span class="proof-value">{p.value}</span>
+            <span class="proof-label">{p.label}</span>
+            {p.source && (
+              <a class="proof-source" href={p.source} {...newTab}>
+                source<span class="visually-hidden"> for {p.value} runs (opens in a new tab)</span>
+              </a>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section id="projects" class="section container" aria-labelledby="projects-title">
+    <h2 id="projects-title" class="section-title">Projects</h2>
+    <div class="projects">
+      {featured.map((project) => <ProjectCard project={project} />)}
+      {more.map((project) => <ProjectCard project={project} />)}
+    </div>
+  </section>
+
+  <section id="experience" class="section container" aria-labelledby="experience-title">
+    <h2 id="experience-title" class="section-title">Experience</h2>
+    <ol class="timeline">
+      {
+        experience.map((job) => (
+          <li>
+            <div class="job-head">
+              <h3>
+                {job.role} · {job.company}
+              </h3>
+              <p class="job-meta">
+                {job.dates}
+                {job.client && <> · Client: {job.client}</>}
+              </p>
+              {job.note && <p class="job-meta">{job.note}</p>}
+            </div>
+            <ul>
+              {job.bullets.map((b) => (
+                <li>{b}</li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section id="skills" class="section container" aria-labelledby="skills-title">
+    <h2 id="skills-title" class="section-title">Skills</h2>
+    <dl class="skills">
+      {
+        skills.map((s) => (
+          <div>
+            <dt>{s.group}</dt>
+            <dd>{s.items.join(' · ')}</dd>
+          </div>
+        ))
+      }
+    </dl>
+    <div class="two-col">
+      <div>
+        <h3 class="sub-title">Certifications</h3>
+        <ul class="plain">
+          {certifications.map((c) => <li>{c}</li>)}
+        </ul>
+      </div>
+      <div>
+        <h3 class="sub-title">Education</h3>
+        <ul class="plain">
+          {
+            education.map((e) => (
+              <li>
+                <strong>{e.degree}</strong>, {e.school} · {e.detail}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="section container" aria-labelledby="about-title">
+    <h2 id="about-title" class="section-title">About</h2>
+    <div class="prose">
+      <p>
+        I've spent 15 years on the systems behind health insurance: claims adjudication, member enrollment, EDI feeds
+        and contact centers, where a quiet bug means a wrong claim or a missed member. That work taught me to care about
+        correctness, auditability and what happens when things fail.
+      </p>
+      <p>
+        Now I bring the same habits to AI. I build LLM systems that show their evidence, say "I don't know" when they
+        should, and keep running when a process crashes. I finished my M.S. in Computer Science at CSUDH in 2026, and
+        AgentForge is where I put those ideas to the test.
+      </p>
+    </div>
+  </section>
+
+  <section id="contact" class="section container" aria-labelledby="contact-title">
+    <h2 id="contact-title" class="section-title">Contact</h2>
+    <p class="contact-text">The best way to reach me is on LinkedIn.</p>
+    <div class="actions">
+      <a class="btn btn-primary" href={profile.links.linkedin} {...newTab}>
+        Message me on LinkedIn<span class="visually-hidden"> (opens in a new tab)</span>
+      </a>
+      <a class="btn" href={profile.links.github} {...newTab}>
+        GitHub<span class="visually-hidden"> (opens in a new tab)</span>
+      </a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    /* The hexagon reaches past the photo; never let it cause sideways scrolling. */
+    overflow-x: clip;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 28px;
+    padding-block: 40px 32px;
+  }
+  .hero-text {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .eyebrow {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+  h1 {
+    font-size: clamp(32px, 6vw, 52px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .lede {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 640px;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .photo {
+    position: relative;
+    width: 160px;
+    padding: 5px;
+    border-radius: 24px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+  }
+  /* A faint hexagon behind the photo, echoing the logo. Desktop only. */
+  .hex {
+    display: none;
+    position: absolute;
+    z-index: -1;
+    inset: -22%;
+    width: 144%;
+    height: 144%;
+    max-width: none;
+    fill: none;
+    stroke: var(--accent-text);
+    stroke-width: 0.6;
+    opacity: 0.45;
+  }
+  .photo img {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    border-radius: 19px;
+    object-fit: cover;
+  }
+  @media (min-width: 960px) {
+    .hero {
+      flex-direction: row;
+      align-items: center;
+      gap: 64px;
+      padding-block: 72px 48px;
+    }
+    .hero-text {
+      flex: 1;
+    }
+    .photo {
+      width: 300px;
+      flex-shrink: 0;
+      padding: 6px;
+      border-radius: 28px;
+      margin-right: 40px;
+    }
+    .hex {
+      display: block;
+    }
+    .photo img {
+      border-radius: 22px;
+    }
+  }
+
+  .proof {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .proof li {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+  }
+  .proof-value {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 700;
+  }
+  .proof-label {
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .proof-source {
+    font-size: 14px;
+  }
+
+  .projects {
+    display: grid;
+    gap: 24px;
+  }
+
+  .timeline {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-left: 2px solid var(--border-strong);
+  }
+  .timeline > li {
+    position: relative;
+    padding: 0 0 32px 24px;
+  }
+  .timeline > li::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 8px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .timeline h3 {
+    font-size: 20px;
+  }
+  .job-meta {
+    color: var(--muted);
+    font-size: 15px;
+    margin-top: 4px;
+  }
+  .timeline ul {
+    margin: 12px 0 0;
+    padding-left: 20px;
+  }
+  .timeline ul li + li {
+    margin-top: 6px;
+  }
+
+  .skills {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin: 0 0 32px;
+  }
+  .skills div {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+  }
+  .skills dt {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .skills dd {
+    margin: 0;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .two-col {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 32px;
+  }
+  .sub-title {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+  .plain {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .plain li + li {
+    margin-top: 6px;
+  }
+  .plain strong {
+    color: var(--text);
+  }
+
+  .prose {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 720px;
+    font-size: 18px;
+  }
+  .contact-text {
+    margin-bottom: 20px;
+    font-size: 18px;
+  }
+</style>

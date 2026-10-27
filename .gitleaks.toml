@@ -1,0 +1,17 @@
+title = "Portfolio site gitleaks config"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Dependency and generated directories (never committed)"
+paths = [
+  '''(^|/)node_modules/''',
+  '''(^|/)\.git/''',
+  '''(^|/)dist/''',
+  '''(^|/)\.astro/''',
+  '''(^|/)\.lighthouseci/''',
+  '''(^|/)test-results/''',
+  '''(^|/)playwright-report/''',
+  '''(^|/)pnpm-lock\.yaml$''',
+]

@@ -1,0 +1,28 @@
+# Supply-chain policy: only install versions published at least 14 days ago (minutes).
+minimumReleaseAge: 20160
+
+# Exceptions: security fixes may be adopted before they are 14 days old. Exact versions only,
+# each with its reason and date. Remove an entry once the version is older than the window.
+minimumReleaseAgeExclude:
+  # GHSA-333x-w4r6-6crp and three more in fast-uri, fixed in 3.1.9 (2026-10-19); reached only
+  # through ajv in dev tooling; found by OSV-Scanner, adopted 2026-10-27.
+  - fast-uri@3.1.9
+  # GHSA-6pq8-jhm2-2vcw in qs, fixed in 6.16.1 (2026-10-14); reached only through Lighthouse
+  # CI's local server (express), never used here; found by OSV-Scanner, adopted 2026-10-27.
+  - qs@6.16.1
+  # GHSA-27r3-jxmh-p828 (HIGH) in body-parser, fixed in 1.20.9 (2026-10-22); same path as qs.
+  - body-parser@1.20.9
+  # GHSA-xjj6-f33q-929c (HIGH) and two more in undici, fixed in 8.12.2 (2026-10-15); reached
+  # through Astro's font fetcher at build time; found by OSV-Scanner, adopted 2026-10-27.
+  - undici@8.12.2
+
+# Force patched versions of vulnerable transitive dependencies (found by OSV-Scanner). All are
+# build or test tooling; none ships to visitors. Unfixable ones are in osv-scanner.toml.
+overrides:
+  fast-uri: ">=3.1.9 <4" # via ajv (dev tooling)
+  qs: ">=6.16.1 <7" # via express in @lhci/cli
+  body-parser@1: ">=1.20.9 <2" # via express in @lhci/cli
+  fflate: ">=0.7.5 <0.8" # GHSA-px8p-9vwx-vf98, via satori (build-time preview images)
+  tmp: ">=0.2.6 <0.3" # GHSA-ph9p-34f9-6g65, GHSA-52f5-9888-hmc6, via @lhci/cli
+  undici: ">=8.12.2 <9" # via unifont (Astro fonts, build time)
+  uuid: ">=11.1.1 <12" # GHSA-w5hq-g745-h8pq, via @lhci/cli
