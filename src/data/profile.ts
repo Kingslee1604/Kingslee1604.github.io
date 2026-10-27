@@ -83,6 +83,7 @@ export const skills = [
   {
     group: 'AI & LLM',
     items: [
+      'LLMs & SLMs',
       'Azure OpenAI',
       'Azure AI Foundry',
       'Semantic Kernel',
