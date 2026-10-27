@@ -82,6 +82,11 @@
   box-sizing: border-box;
 }
 
+/* `hidden` must win over any display rule (e.g. `.btn`, `img { display: block }`). */
+[hidden] {
+  display: none !important;
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 24px;

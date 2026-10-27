@@ -1,5 +1,5 @@
 ---
-import { getImage } from 'astro:assets';
+import { Image } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { newTab } from '../../data/profile';
@@ -12,8 +12,6 @@ export async function getStaticPaths() {
 const { project } = Astro.props;
 const { title, summary, tags, repo, release, cover, coverAlt, demo } = project.data;
 const { Content } = await render(project);
-// Still image shown instead of the GIF when the visitor asks for reduced motion.
-const still = cover ? await getImage({ src: cover, width: 1104 }) : undefined;
 ---
 
 <Base
@@ -48,25 +46,69 @@ const still = cover ? await getImage({ src: cover, width: 1104 }) : undefined;
     </header>
 
     {
-      demo && (
+      /* A small still image loads first (fast to show); the animated demo loads only when the
+         visitor presses Play, and can be stopped, so nothing moves without their choice. */
+      cover && (
         <figure class="demo">
-          <picture>
-            {still && <source srcset={still.src} media="(prefers-reduced-motion: reduce)" />}
-            <img src={demo.src} width={demo.width} height={demo.height} alt={demo.alt} loading="lazy" decoding="async" />
-          </picture>
+          <Image
+            src={cover}
+            alt={coverAlt ?? ''}
+            widths={[480, 820, 1104]}
+            sizes="(min-width: 1184px) 1104px, 100vw"
+            loading="eager"
+            fetchpriority="high"
+            data-demo-still
+          />
+          {demo && <img data-demo-gif data-src={demo.src} width={demo.width} height={demo.height} alt={demo.alt} hidden />}
+          {
+            demo && (
+              <div class="demo-controls">
+                <button type="button" class="btn btn-primary" data-demo-toggle hidden>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M7 4.5v15l13-7.5z" />
+                  </svg>
+                  <span data-demo-label>Play the demo</span>
+                </button>
+                <noscript>
+                  <a href={demo.src}>Watch the demo (animated GIF)</a>
+                </noscript>
+              </div>
+            )
+          }
           <figcaption>
-            Recorded on the CPU-only laptop with the real model and fictional demo documents, shown as a time-lapse.
+            {
+              demo
+                ? 'A time-lapse recorded on the CPU-only laptop with the real model and fictional demo documents: about 15 minutes in 8 seconds.'
+                : coverAlt
+            }
           </figcaption>
         </figure>
       )
     }
-    {!demo && cover && <img class="demo" src={still?.src} alt={coverAlt ?? ''} />}
 
     <div class="prose">
       <Content />
     </div>
   </article>
 </Base>
+
+<script>
+  for (const figure of document.querySelectorAll<HTMLElement>('.demo')) {
+    const still = figure.querySelector<HTMLImageElement>('[data-demo-still]');
+    const gif = figure.querySelector<HTMLImageElement>('[data-demo-gif]');
+    const button = figure.querySelector<HTMLButtonElement>('[data-demo-toggle]');
+    const label = figure.querySelector('[data-demo-label]');
+    if (!still || !gif || !button || !label) continue;
+    button.hidden = false;
+    button.addEventListener('click', () => {
+      const play = gif.hidden;
+      if (play && !gif.getAttribute('src')) gif.src = gif.dataset.src ?? '';
+      gif.hidden = !play;
+      still.hidden = play;
+      label.textContent = play ? 'Stop the demo' : 'Play the demo';
+    });
+  }
+</script>
 
 <style>
   .case {
@@ -109,12 +151,15 @@ const still = cover ? await getImage({ src: cover, width: 1104 }) : undefined;
   .demo {
     margin: 40px 0;
   }
-  .demo img {
+  .demo :global(img) {
     display: block;
     width: 100%;
     height: auto;
     border-radius: var(--radius);
     border: 1px solid var(--border);
+  }
+  .demo-controls {
+    margin-top: 14px;
   }
   .demo figcaption {
     margin-top: 10px;

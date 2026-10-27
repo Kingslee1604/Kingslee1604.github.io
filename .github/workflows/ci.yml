@@ -67,6 +67,7 @@ jobs:
         with:
           name: lighthouse
           path: .lighthouseci/
+          include-hidden-files: true # the folder name starts with a dot
           if-no-files-found: ignore
       - name: Package the site for GitHub Pages
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
