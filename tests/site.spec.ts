@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-const pages = ['/', '/projects/agentforge/', '/404.html'];
+const pages = ['/', '/projects/agentforge/', '/projects/medrex/', '/404.html'];
 
 for (const path of pages) {
   for (const theme of ['dark', 'light'] as const) {
@@ -77,7 +77,7 @@ test('the demo never moves on its own; Play starts it and Stop returns to the st
 });
 
 test('every page has a link-preview image that loads', async ({ page, request }) => {
-  for (const path of pages.slice(0, 2)) {
+  for (const path of pages.filter((p) => !p.endsWith('404.html'))) {
     await page.goto(path);
     const og = await page.locator('meta[property="og:image"]').getAttribute('content');
     expect(og).toMatch(/^https:\/\/kingslee1604\.github\.io\/og\/.+\.png$/);
