@@ -16,6 +16,7 @@ demo:
   width: 1104
   height: 662
   alt: 'AgentForge in action: the dashboard, a 12-question run with the Planner, Drafter, Verifier and Reviewer agents working, a verified answer with its highlighted source, and the review screen.'
+  caption: 'A time-lapse recorded on the CPU-only laptop with the real model and fictional demo documents: about 15 minutes in 8 seconds.'
 metrics:
   - value: 100%
     label: retrieval recall@5

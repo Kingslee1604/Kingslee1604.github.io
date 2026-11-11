@@ -8,14 +8,14 @@ interface Props {
 }
 
 const { project } = Astro.props;
-const { title, summary, tags, repo, release, cover, coverAlt, caseStudy, metrics, featured } = project.data;
+const { title, summary, tags, repo, release, cover, coverAlt, coverPosition, caseStudy, metrics, featured } = project.data;
 const caseStudyUrl = `/projects/${project.id}/`;
 ---
 
 <article class:list={['card', { featured, compact: !featured && !cover }]}>
   {
     cover && (
-      <div class="media">
+      <div class="media" data-position={coverPosition}>
         <Image src={cover} alt={coverAlt ?? ''} widths={[480, 720, 1040]} sizes="(min-width: 960px) 520px, 100vw" />
       </div>
     )
@@ -81,6 +81,9 @@ const caseStudyUrl = `/projects/${project.id}/`;
     aspect-ratio: 16 / 10;
     object-fit: cover;
     object-position: top left;
+  }
+  .media[data-position='center'] img {
+    object-position: center;
   }
   .body {
     display: flex;

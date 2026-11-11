@@ -1,7 +1,7 @@
 ---
 title: MEDREx
 summary: Reads noisy pathology reports and names the cancer type out of 32, comparing six NLP methods on equal terms. A TF-IDF + linear SVM beat the sponsor's published baseline, fine-tuned BERT and RAG with LLMs.
-order: 2
+order: 3
 caseStudy: true
 tags: [Python, scikit-learn, Bio_ClinicalBERT, Sentence embeddings, RAG, Ollama, GPT-4o-mini, Streamlit]
 repo: https://github.com/Kingslee1604/MEDREx-Masters-Project/tree/submission

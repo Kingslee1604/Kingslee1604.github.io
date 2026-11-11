@@ -16,8 +16,12 @@ const projects = defineCollection({
       release: z.object({ label: z.string(), url: z.string() }).optional(),
       cover: image().optional(),
       coverAlt: z.string().optional(),
+      // Which part of the cover stays in view when the project card crops it.
+      coverPosition: z.enum(['top left', 'center']).default('top left'),
       // An animated demo, shown on the case study; the cover replaces it for reduced motion.
-      demo: z.object({ src: z.string(), width: z.number(), height: z.number(), alt: z.string() }).optional(),
+      demo: z
+        .object({ src: z.string(), width: z.number(), height: z.number(), alt: z.string(), caption: z.string() })
+        .optional(),
       caseStudy: z.boolean().default(false),
       // Highlights for the project card. Every value needs a source link.
       metrics: z.array(z.object({ value: z.string(), label: z.string(), source: z.string() })).default([]),
