@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-const pages = ['/', '/projects/agentforge/', '/projects/medrex/', '/404.html'];
+const pages = ['/', '/projects/agentforge/', '/projects/event-platform/', '/projects/medrex/', '/404.html'];
 
 for (const path of pages) {
   for (const theme of ['dark', 'light'] as const) {
@@ -57,24 +57,26 @@ test('the theme toggle switches theme and remembers the choice', async ({ page }
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
 });
 
-test('the demo never moves on its own; Play starts it and Stop returns to the still', async ({ page }) => {
-  await page.goto('/projects/agentforge/');
-  const still = page.locator('[data-demo-still]');
-  const gif = page.locator('[data-demo-gif]');
-  await expect(still).toBeVisible();
-  await expect(gif).toBeHidden();
-  // The GIF is not even downloaded until asked for.
-  expect(await gif.getAttribute('src')).toBeNull();
+for (const demoPage of ['/projects/agentforge/', '/projects/event-platform/']) {
+  test(`the demo on ${demoPage} never moves on its own; Play starts it and Stop returns to the still`, async ({ page }) => {
+    await page.goto(demoPage);
+    const still = page.locator('[data-demo-still]');
+    const gif = page.locator('[data-demo-gif]');
+    await expect(still).toBeVisible();
+    await expect(gif).toBeHidden();
+    // The GIF is not even downloaded until asked for.
+    expect(await gif.getAttribute('src')).toBeNull();
 
-  await page.getByRole('button', { name: 'Play the demo' }).click();
-  await expect(gif).toBeVisible();
-  await expect(gif).toHaveAttribute('src', /\.gif$/);
-  await expect(still).toBeHidden();
+    await page.getByRole('button', { name: 'Play the demo' }).click();
+    await expect(gif).toBeVisible();
+    await expect(gif).toHaveAttribute('src', /\.gif$/);
+    await expect(still).toBeHidden();
 
-  await page.getByRole('button', { name: 'Stop the demo' }).click();
-  await expect(still).toBeVisible();
-  await expect(gif).toBeHidden();
-});
+    await page.getByRole('button', { name: 'Stop the demo' }).click();
+    await expect(still).toBeVisible();
+    await expect(gif).toBeHidden();
+  });
+}
 
 test('every page has a link-preview image that loads', async ({ page, request }) => {
   for (const path of pages.filter((p) => !p.endsWith('404.html'))) {

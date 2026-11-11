@@ -75,13 +75,7 @@ const { Content } = await render(project);
               </div>
             )
           }
-          <figcaption>
-            {
-              demo
-                ? 'A time-lapse recorded on the CPU-only laptop with the real model and fictional demo documents: about 15 minutes in 8 seconds.'
-                : coverAlt
-            }
-          </figcaption>
+          <figcaption>{demo ? demo.caption : coverAlt}</figcaption>
         </figure>
       )
     }
